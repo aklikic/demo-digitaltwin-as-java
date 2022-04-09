@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package com.example.digitaltwin;
+
+import "akkaserverless/annotations.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option java_outer_classname = "DigitalTwinApi";
+
+message DigitalTwinState {
+  bool metric_alert_active = 1;
+}
+
+message CreateCommand {
+  string dt_id = 1 [(akkaserverless.field).entity_key = true];
+  string name = 2;
+  int64 metric_value_alert_threshold = 3;
+}
+
+message AddMetricCommand {
+  string dt_id = 1 [(akkaserverless.field).entity_key = true];
+  int64 metric_value = 2;
+}
+
+message GetDigitalTwinStateCommand {
+  string dt_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+
+service DigitalTwinService {
+  option (akkaserverless.codegen) = {
+        event_sourced_entity: {
+          name: "com.example.digitaltwin.domain.DigitalTwin"
+          entity_type: "digitaltwin"
+          state: "com.example.digitaltwin.domain.DigitalTwinDomainState"
+          events: [
+            "com.example.digitaltwin.domain.Created",
+            "com.example.digitaltwin.domain.AlertTriggered",
+            "com.example.digitaltwin.domain.AlertCanceled"]
+        }
+      };
+  rpc Create (CreateCommand) returns (google.protobuf.Empty) {
+          option (google.api.http) = {
+            post: "/digitaltwin/{dt_id}/create"
+            body: "*"
+          };
+        }
+
+        rpc AddMetric (AddMetricCommand) returns (google.protobuf.Empty) {
+          option (google.api.http) = {
+            post: "/digitaltwin/{dt_id}/add-metric"
+            body: "*"
+          };
+        }
+
+        rpc GetDigitalTwinState (GetDigitalTwinStateCommand) returns (DigitalTwinState) {
+          option (google.api.http) = {
+            get: "/digitaltwin/{dt_id}"
+          };
+        }
+}

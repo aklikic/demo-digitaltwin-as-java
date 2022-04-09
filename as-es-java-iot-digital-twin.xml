@@ -1,0 +1,94 @@
+<templateSet group="as-es-java-iot-digital-twin">
+  <template name="aheader" value="syntax = &quot;proto3&quot;;&#10;&#10;package com.example.digitaltwin;&#10;&#10;import &quot;akkaserverless/annotations.proto&quot;;&#10;import &quot;google/api/annotations.proto&quot;;&#10;import &quot;google/protobuf/empty.proto&quot;;&#10;&#10;option java_outer_classname = &quot;DigitalTwinApi&quot;;" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="astate" value="message DigitalTwinState {&#10;  bool metric_alert_active = 1;&#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="acmds" value="message CreateCommand {&#10;  string dt_id = 1 [(akkaserverless.field).entity_key = true];&#10;  string name = 2;&#10;  int64 metric_value_alert_threshold = 3;&#10;}&#10;&#10;message AddMetricCommand {&#10;  string dt_id = 1 [(akkaserverless.field).entity_key = true];&#10;  int64 metric_value = 2;&#10;}&#10;&#10;message GetDigitalTwinStateCommand {&#10;  string dt_id = 1 [(akkaserverless.field).entity_key = true];&#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="asrv" value="service DigitalTwinService {&#10;    &#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="afunc" value="rpc Create (CreateCommand) returns (google.protobuf.Empty) {&#10;          option (google.api.http) = {&#10;            post: &quot;/digitaltwin/{dt_id}/create&quot;&#10;            body: &quot;*&quot;&#10;          };&#10;        }&#10;&#10;        rpc AddMetric (AddMetricCommand) returns (google.protobuf.Empty) {&#10;          option (google.api.http) = {&#10;            post: &quot;/digitaltwin/{dt_id}/add-metric&quot;&#10;            body: &quot;*&quot;&#10;          };&#10;        }&#10;&#10;        rpc GetDigitalTwinState (GetDigitalTwinStateCommand) returns (DigitalTwinState) {&#10;          option (google.api.http) = {&#10;            get: &quot;/digitaltwin/{dt_id}&quot;&#10;          };&#10;        }" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="acodegen" value="option (akkaserverless.codegen) = {&#10;        event_sourced_entity: {&#10;          name: &quot;com.example.digitaltwin.domain.DigitalTwin&quot;&#10;          entity_type: &quot;digitaltwin&quot;&#10;          state: &quot;com.example.digitaltwin.domain.DigitalTwinDomainState&quot;&#10;          events: [&#10;            &quot;com.example.digitaltwin.domain.Created&quot;,&#10;            &quot;com.example.digitaltwin.domain.AlertTriggered&quot;,&#10;            &quot;com.example.digitaltwin.domain.AlertCanceled&quot;]&#10;        }&#10;      };" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="dheader" value="syntax = &quot;proto3&quot;;&#10;&#10;package com.example.digitaltwin.domain;&#10;&#10;option java_outer_classname = &quot;DigitalTwinDomain&quot;;" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="devts" value="message Created {&#10;  string name = 1;&#10;  int64 metric_value_alert_threshold = 2;&#10;}&#10;&#10;message AlertTriggered {&#10;  int64 metric_value = 1;&#10;}&#10;&#10;message AlertCanceled {}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="dstate" value="message DigitalTwinDomainState {&#10;  string name = 1;&#10;  int64 metric_value_alert_threshold = 2;&#10;  bool metric_alert_active = 3;&#10;  int64 metric_value_for_alert = 4;&#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="eall" value="@Override&#10;  public DigitalTwinDomain.DigitalTwinDomainState emptyState() {&#10;    return DigitalTwinDomain.DigitalTwinDomainState.getDefaultInstance();&#10;  }&#10;&#10;  @Override&#10;  public Effect&lt;Empty&gt; create(DigitalTwinDomain.DigitalTwinDomainState currentState, DigitalTwinApi.CreateCommand createCommand) {&#10;    DigitalTwinDomain.Created event = DigitalTwinDomain.Created.newBuilder()&#10;            .setName(createCommand.getName())&#10;            .setMetricValueAlertThreshold(createCommand.getMetricValueAlertThreshold())&#10;            .build();&#10;&#10;    return effects()&#10;            .emitEvent(event)&#10;            .thenReply(newState -&gt; Empty.getDefaultInstance());&#10;  }&#10;&#10;  @Override&#10;  public Effect&lt;Empty&gt; addMetric(DigitalTwinDomain.DigitalTwinDomainState currentState, DigitalTwinApi.AddMetricCommand addMetricCommand) {&#10;    if(currentState.equals(DigitalTwinDomain.DigitalTwinDomainState.getDefaultInstance())){&#10;      return effects().error(&quot;Not found&quot;);&#10;    }&#10;    if(!currentState.getMetricAlertActive() &amp;&amp; addMetricCommand.getMetricValue() &gt;= currentState.getMetricValueAlertThreshold()) {&#10;&#10;      DigitalTwinDomain.AlertTriggered event = DigitalTwinDomain.AlertTriggered.newBuilder()&#10;              .setMetricValue(addMetricCommand.getMetricValue())&#10;              .build();&#10;      return effects()&#10;              .emitEvent(event)&#10;              .thenReply(newState -&gt; Empty.getDefaultInstance());&#10;&#10;    } else if(currentState.getMetricAlertActive() &amp;&amp; addMetricCommand.getMetricValue() &lt; currentState.getMetricValueAlertThreshold()) {&#10;&#10;      DigitalTwinDomain.AlertCanceled event = DigitalTwinDomain.AlertCanceled.newBuilder().build();&#10;      return effects()&#10;              .emitEvent(event)&#10;              .thenReply(newState -&gt; Empty.getDefaultInstance());&#10;&#10;    } else {&#10;      return effects().reply(Empty.getDefaultInstance());&#10;    }&#10;&#10;&#10;&#10;  }&#10;&#10;  @Override&#10;  public Effect&lt;DigitalTwinApi.DigitalTwinState&gt; getDigitalTwinState(DigitalTwinDomain.DigitalTwinDomainState currentState, DigitalTwinApi.GetDigitalTwinStateCommand getDigitalTwinStateCommand) {&#10;    if(currentState.equals(DigitalTwinDomain.DigitalTwinDomainState.getDefaultInstance())){&#10;      return effects().error(&quot;Not found&quot;);&#10;    }&#10;    return effects().reply(map(currentState));&#10;  }&#10;&#10;  private DigitalTwinApi.DigitalTwinState map (DigitalTwinDomain.DigitalTwinDomainState domainState){&#10;    DigitalTwinApi.DigitalTwinState apiState = DigitalTwinApi.DigitalTwinState.newBuilder()&#10;            .setMetricAlertActive(domainState.getMetricAlertActive())&#10;            .build();&#10;    return apiState;&#10;  }&#10;&#10;  @Override&#10;  public DigitalTwinDomain.DigitalTwinDomainState created(DigitalTwinDomain.DigitalTwinDomainState currentState, DigitalTwinDomain.Created created) {&#10;    return currentState.toBuilder()&#10;            .setName(created.getName())&#10;            .setMetricValueAlertThreshold(created.getMetricValueAlertThreshold())&#10;            .build();&#10;  }&#10;  @Override&#10;  public DigitalTwinDomain.DigitalTwinDomainState alertTriggered(DigitalTwinDomain.DigitalTwinDomainState currentState, DigitalTwinDomain.AlertTriggered alarmTriggered) {&#10;    return currentState.toBuilder()&#10;            .setMetricAlertActive(true)&#10;            .setMetricValueForAlert(alarmTriggered.getMetricValue())&#10;            .build();&#10;  }&#10;  @Override&#10;  public DigitalTwinDomain.DigitalTwinDomainState alertCanceled(DigitalTwinDomain.DigitalTwinDomainState currentState, DigitalTwinDomain.AlertCanceled alarmCanceled) {&#10;    return currentState.toBuilder()&#10;            .setMetricAlertActive(false)&#10;            .setMetricValueForAlert(0)&#10;            .build();&#10;  }" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="JAVA_CODE" value="true" />
+    </context>
+  </template>
+  <template name="ut" value="@Test&#10;public void happyPath() {&#10;    String dtId =  java.util.UUID.randomUUID().toString();&#10;    String name = &quot;name&quot;;&#10;    long metricValueAlertThreshold = 10l;&#10;    long metricValueOk = 5;&#10;    long metricValueAlert = 11;&#10;    DigitalTwinTestKit testKit = DigitalTwinTestKit.of(dtId, DigitalTwin::new);&#10;&#10;    DigitalTwinApi.CreateCommand create = DigitalTwinApi.CreateCommand.newBuilder()&#10;            .setDtId(dtId)&#10;            .setMetricValueAlertThreshold(metricValueAlertThreshold)&#10;            .setName(name)&#10;            .build();&#10;&#10;    EventSourcedResult&lt;Empty&gt; result = testKit.create(create);&#10;    assertEquals(true, result.didEmitEvents());&#10;    DigitalTwinDomain.Created createdEvent = result.getNextEventOfType(DigitalTwinDomain.Created.class);&#10;    assertEquals(name, createdEvent.getName());&#10;&#10;    DigitalTwinApi.AddMetricCommand addOk = DigitalTwinApi.AddMetricCommand.newBuilder()&#10;            .setDtId(dtId)&#10;            .setMetricValue(metricValueOk)&#10;            .build();&#10;    result = testKit.addMetric(addOk);&#10;    assertEquals(false, result.didEmitEvents());&#10;&#10;    DigitalTwinApi.AddMetricCommand addAlert = DigitalTwinApi.AddMetricCommand.newBuilder()&#10;            .setDtId(dtId)&#10;            .setMetricValue(metricValueAlert)&#10;            .build();&#10;    result = testKit.addMetric(addAlert);&#10;    assertEquals(true, result.didEmitEvents());&#10;    DigitalTwinDomain.AlertTriggered alertTriggeredEvent = result.getNextEventOfType(DigitalTwinDomain.AlertTriggered.class);&#10;    assertEquals(metricValueAlert,alertTriggeredEvent.getMetricValue());&#10;&#10;    DigitalTwinApi.GetDigitalTwinStateCommand get = DigitalTwinApi.GetDigitalTwinStateCommand.newBuilder().setDtId(dtId).build();&#10;    EventSourcedResult&lt;DigitalTwinApi.DigitalTwinState&gt; getResult = testKit.getDigitalTwinState(get);&#10;    assertEquals(true, getResult.getReply().getMetricAlertActive());&#10;&#10;    result = testKit.addMetric(addOk);&#10;    assertEquals(true, result.didEmitEvents());&#10;    DigitalTwinDomain.AlertCanceled alertCanceledEvent = result.getNextEventOfType(DigitalTwinDomain.AlertCanceled.class);&#10;&#10;    get = DigitalTwinApi.GetDigitalTwinStateCommand.newBuilder().setDtId(dtId).build();&#10;    getResult = testKit.getDigitalTwinState(get);&#10;    assertEquals(false, getResult.getReply().getMetricAlertActive());&#10;&#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="JAVA_CODE" value="true" />
+    </context>
+  </template>
+  <template name="it" value="@Test&#10;public void happyPath() throws Exception {&#10;    String dtId =  java.util.UUID.randomUUID().toString();&#10;    String name = &quot;name&quot;;&#10;    long metricValueAlertThreshold = 10l;&#10;    long metricValueOk = 5;&#10;    long metricValueAlert = 11;&#10;&#10;    DigitalTwinApi.CreateCommand create = DigitalTwinApi.CreateCommand.newBuilder()&#10;            .setDtId(dtId)&#10;            .setMetricValueAlertThreshold(metricValueAlertThreshold)&#10;            .setName(name)&#10;            .build();&#10;    client.create(create).toCompletableFuture().get();&#10;&#10;    DigitalTwinApi.GetDigitalTwinStateCommand get = DigitalTwinApi.GetDigitalTwinStateCommand.newBuilder().setDtId(dtId).build();&#10;    DigitalTwinApi.DigitalTwinState state = client.getDigitalTwinState(get).toCompletableFuture().get();&#10;    org.junit.Assert.assertEquals(false, state.getMetricAlertActive());&#10;&#10;    DigitalTwinApi.AddMetricCommand addOk = DigitalTwinApi.AddMetricCommand.newBuilder()&#10;            .setDtId(dtId)&#10;            .setMetricValue(metricValueOk)&#10;            .build();&#10;    client.addMetric(addOk);&#10;&#10;    state = client.getDigitalTwinState(get).toCompletableFuture().get();&#10;    org.junit.Assert.assertEquals(false, state.getMetricAlertActive());&#10;&#10;    DigitalTwinApi.AddMetricCommand addAlert = DigitalTwinApi.AddMetricCommand.newBuilder()&#10;            .setDtId(dtId)&#10;            .setMetricValue(metricValueAlert)&#10;            .build();&#10;    client.addMetric(addAlert);&#10;&#10;    state = client.getDigitalTwinState(get).toCompletableFuture().get();&#10;    org.junit.Assert.assertEquals(true, state.getMetricAlertActive());&#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="JAVA_CODE" value="true" />
+    </context>
+  </template>
+  <template name="theader" value="syntax = &quot;proto3&quot;;&#10;&#10;package com.example.digitaltwin;&#10;&#10;import &quot;akkaserverless/annotations.proto&quot;;&#10;import &quot;google/api/annotations.proto&quot;;&#10;import &quot;google/protobuf/empty.proto&quot;;&#10;import &quot;google/protobuf/any.proto&quot;;&#10;&#10;import &quot;com/example/digitaltwin/domain/digitaltwin_domain.proto&quot;;&#10;&#10;option java_outer_classname = &quot;DigitalTwinTopicApi&quot;;" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="tevts" value="message AlertTriggeredTopicEvent{&#10;  string dt_id = 1;&#10;  int64 metric_value = 2;&#10;}&#10;&#10;message AlertCanceledTopicEvent{&#10;  string dt_id = 1;&#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="tsrv" value="service DigitalTwinToTopic {&#10;  option (akkaserverless.codegen) = {&#10;    action: {}&#10;  };&#10;  rpc AlertTriggered (com.example.digitaltwin.domain.AlertTriggered) returns (AlertTriggeredTopicEvent) {&#10;    option (akkaserverless.method).eventing.in = {&#10;      event_sourced_entity: &quot;digitaltwin&quot;&#10;    };&#10;    option (akkaserverless.method).eventing.out = {&#10;      topic:  &quot;digitaltwin-topic&quot;&#10;    };&#10;  }&#10;  rpc AlertCanceled (com.example.digitaltwin.domain.AlertCanceled) returns (AlertCanceledTopicEvent) {&#10;    option (akkaserverless.method).eventing.in = {&#10;      event_sourced_entity: &quot;digitaltwin&quot;&#10;    };&#10;    option (akkaserverless.method).eventing.out = {&#10;      topic:  &quot;digitaltwin-topic&quot;&#10;    };&#10;  }&#10;  rpc Ignore(google.protobuf.Any) returns (google.protobuf.Empty) {&#10;    option (akkaserverless.method).eventing.in = {&#10;      event_sourced_entity: &quot;digitaltwin&quot;&#10;    };&#10;  }&#10;}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="PROTO" value="true" />
+      <option name="PROTOTEXT" value="true" />
+    </context>
+  </template>
+  <template name="tall" value="@Override&#10;  public Effect&lt;DigitalTwinTopicApi.AlertTriggeredTopicEvent&gt; alertTriggered(DigitalTwinDomain.AlertTriggered alertTriggered) {&#10;    DigitalTwinTopicApi.AlertTriggeredTopicEvent topicEvent = DigitalTwinTopicApi.AlertTriggeredTopicEvent.newBuilder()&#10;            .setDtId(actionContext().eventSubject().get())&#10;            .setMetricValue(alertTriggered.getMetricValue())&#10;            .build();&#10;    return effects().reply(topicEvent);&#10;  }&#10;  @Override&#10;  public Effect&lt;DigitalTwinTopicApi.AlertCanceledTopicEvent&gt; alertCanceled(DigitalTwinDomain.AlertCanceled alertCanceled) {&#10;    DigitalTwinTopicApi.AlertCanceledTopicEvent topicEvent = DigitalTwinTopicApi.AlertCanceledTopicEvent.newBuilder()&#10;            .setDtId(actionContext().eventSubject().get())&#10;            .build();&#10;    return effects().reply(topicEvent);&#10;  }&#10;  @Override&#10;  public Effect&lt;Empty&gt; ignore(Any any) {&#10;    return effects().reply(Empty.getDefaultInstance());&#10;  }" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="JAVA_CODE" value="true" />
+    </context>
+  </template>
+</templateSet>

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package com.example.digitaltwin.domain;
+
+option java_outer_classname = "DigitalTwinDomain";
+
+message DigitalTwinDomainState {
+  string name = 1;
+  int64 metric_value_alert_threshold = 2;
+  bool metric_alert_active = 3;
+  int64 metric_value_for_alert = 4;
+}
+
+message Created {
+  string name = 1;
+  int64 metric_value_alert_threshold = 2;
+}
+
+message AlertTriggered {
+  int64 metric_value = 1;
+}
+
+message AlertCanceled {}
