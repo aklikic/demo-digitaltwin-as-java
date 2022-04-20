@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package com.example.digitaltwin;
 
-import "akkaserverless/annotations.proto";
+import "kalix/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/any.proto";
@@ -21,27 +21,27 @@ message AlertCanceledTopicEvent{
 }
 
 service DigitalTwinToTopic {
-  option (akkaserverless.codegen) = {
+  option (kalix.codegen) = {
     action: {}
   };
   rpc AlertTriggered (com.example.digitaltwin.domain.AlertTriggered) returns (AlertTriggeredTopicEvent) {
-    option (akkaserverless.method).eventing.in = {
+    option (kalix.method).eventing.in = {
       event_sourced_entity: "digitaltwin"
     };
-    option (akkaserverless.method).eventing.out = {
+    option (kalix.method).eventing.out = {
       topic:  "digitaltwin-topic"
     };
   }
   rpc AlertCanceled (com.example.digitaltwin.domain.AlertCanceled) returns (AlertCanceledTopicEvent) {
-    option (akkaserverless.method).eventing.in = {
+    option (kalix.method).eventing.in = {
       event_sourced_entity: "digitaltwin"
     };
-    option (akkaserverless.method).eventing.out = {
-      topic:  "digitaltwin-topic"
+    option (kalix.method).eventing.out = {
+      topic: "digitaltwin-topic"
     };
   }
   rpc Ignore(google.protobuf.Any) returns (google.protobuf.Empty) {
-    option (akkaserverless.method).eventing.in = {
+    option (kalix.method).eventing.in = {
       event_sourced_entity: "digitaltwin"
     };
   }

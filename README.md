@@ -3,24 +3,26 @@
 ## Prerequisite
 - Java 11<br>
 - Apache Maven 3.6 or higher<br>
-- Akka Serverless:
-    - Register account: [Login, Register, Register via Google](https://console.akkaserverless.com/p/login)
-    - `akkasls` tool installed: [Akka Serverless CLI](https://developer.lightbend.com/docs/akka-serverless/akkasls/install-akkasls.html)
+- Kalix:
+    - Register account: [Login, Register, Register via Google](https://console.kalix.io)
+    - `kalix` tool installed: [Kalix CLI](https://docs.kalix.io/kalix/install-kalix.html)
     - `akkasls` login
     -  project `demo` created and set for `akkasls`
 - Docker 20.10.8 or higher (engine and client)<br>
 - Docker Hub account (configured with Docker)<br>
-  Access to the `gcr.io/akkaserverless-public` container registry<br>
+  Access to the `gcr.io/kalix-public` container registry<br>
   cURL<br>
   IDE / editor<br>
 
 ## Generate Java project (terminal)
 
-```
+https://docs.kalix.io/java/quickstart-template.html#_generate_and_build_the_kalix_project
+
+```shell
 mvn archetype:generate \
-  -DarchetypeGroupId=com.akkaserverless \
-  -DarchetypeArtifactId=akkaserverless-maven-archetype \
-  -DarchetypeVersion=0.10.6
+  -DarchetypeGroupId=io.kalix \
+  -DarchetypeArtifactId=kalix-maven-archetype \
+  -DarchetypeVersion=LATEST
 ```
 
 ```
@@ -112,49 +114,104 @@ mvn package
 mvn docker:push
 ```
 
-## Deploy to Akka Serverless
-1. Deploy project:
+## Deploy to Kalix
+1. Create the project
+```shell
+kalix projects new digitaltwin "Digital Twin demo" --region=gcp-us-east1
 ```
-akkasls service deploy digitaltwin aklikic/digitaltwin:1.0-SNAPSHOT
+2. Deploy project:
+```
+kalix service deploy digitaltwin aklikic/digitaltwin:1.0-SNAPSHOT
 ```
 Note: replace `aklikic` as in Package
-2. Expose service:
-```
-akkasls services expose digitaltwin
-```
-```
-Service 'digitaltwin' was successfully exposed at: shy-frost-2081.us-east1.akkaserverless.app
-```
-Note: HOSTNAME to use for external access
 
-## Test service in production
-1. Create digital twin
+
+## Try the service prior to exposing it
+
+1. Create a proxy for the deployed service
+```shell
+kalix services proxy digitaltwin
 ```
+
+2. Create a digital twin with ID 123
+```shell
 curl -XPOST -d '{
   "name": "DT1",
   "metric_value_alert_threshold": "10"
-}' https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/123/create -H "Content-Type: application/json"
+}' http://localhost:8080/digitaltwin/123/create -H "Content-Type: application/json"
 ```
-2. Add OK metric
+Expecting and empty reply `{}`.
+
+3. Get the cart (no alert, yet)
+```shell
+curl -XGET http://localhost:8080/digitaltwin/123 -H "Content-Type: application/json"
 ```
-curl -XPOST -d '{
-  "metric_value": "5"
-}' https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/123/add-metric -H "Content-Type: application/json"
-```
-3. Get cart
-```
-curl -XGET https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/123 -H "Content-Type: application/json"
-```
-4. Add ALERT metric
-```
+
+4. Add an ALERT metric
+```shell
 curl -XPOST -d '{
   "metric_value": "11"
-}' https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/123/add-metric -H "Content-Type: application/json"
+}' http://localhost:8080/digitaltwin/123/add-metric -H "Content-Type: application/json"
 ```
+Expecting and empty reply `{}`.
+
+5. Get the cart showing an alert 
+```shell
+curl -XGET http://localhost:8080/digitaltwin/123 -H "Content-Type: application/json"
+```
+
+6. Stop the proxy by pressing Control-C
+
+## Expose the service to the Internet
+
+1. Expose service:
+```shell
+kalix services expose digitaltwin
+```
+
+```
+Service 'digitaltwin' was successfully exposed at: shy-frost-2081.us-east1.kalix.app
+```
+Note: HOSTNAME to use for external access
+
+## Exercise the service in production
+1. Create another digital twin with ID 124
+```shell
+curl -XPOST -d '{
+  "name": "DT1",
+  "metric_value_alert_threshold": "10"
+}' https://shy-frost-2081.us-east1.kalix.app/digitaltwin/124/create -H "Content-Type: application/json"
+```
+Expecting and empty reply `{}`.
+
+2. Add OK metric
+```shell
+curl -XPOST -d '{
+  "metric_value": "5"
+}' https://shy-frost-2081.us-east1.kalix.app/digitaltwin/124/add-metric -H "Content-Type: application/json"
+```
+
+3. Get cart
+```shell
+curl -XGET https://shy-frost-2081.us-east1.kalix.app/digitaltwin/124 -H "Content-Type: application/json"
+```
+Expecting the cart contents `{"metricAlertActive":false}`.
+
+4. Add ALERT metric
+```shell
+curl -XPOST -d '{
+  "metric_value": "11"
+}' https://shy-frost-2081.us-east1.kalix.app/digitaltwin/124/add-metric -H "Content-Type: application/json"
+```
+Expecting and empty reply `{}`.
+
 5. Get cart
+```shell
+curl -XGET https://shy-frost-2081.us-east1.kalix.app/digitaltwin/124 -H "Content-Type: application/json"
 ```
-curl -XGET https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/123 -H "Content-Type: application/json"
-```
+
+Expecting the cart contents `{"metricAlertActive":true}`.
+
 
 ## Eventing (optional)
 
@@ -165,7 +222,7 @@ curl -XGET https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/123 -H
 5. Insert service snippet: `tsrv`
 
 8. Code generation (terminal):
-```
+```shell
 mvn compile
 ```
 9. Refresh project (IDE)
@@ -178,9 +235,9 @@ mvn compile
 ## Copy-paste list
 ```
 mvn archetype:generate \
-  -DarchetypeGroupId=com.akkaserverless \
-  -DarchetypeArtifactId=akkaserverless-maven-archetype \
-  -DarchetypeVersion=0.10.6
+  -DarchetypeGroupId=io.kalix \
+  -DarchetypeArtifactId=kalix-maven-archetype \
+  -DarchetypeVersion=LATEST
 ```
 ```
 com.example
@@ -213,26 +270,26 @@ mvn package
 mvn docker:push
 ```
 ```
-akkasls service deploy digitaltwin aklikic/digitaltwin:1.0-SNAPSHOT
+kalix service deploy digitaltwin aklikic/digitaltwin:1.0-SNAPSHOT
 ```
 ```
 curl -XPOST -d '{
   "name": "DT1",
   "metric_value_alert_threshold": "10"
-}' https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/1234/create -H "Content-Type: application/json"
+}' https://shy-frost-2081.us-east1.kalix.app/digitaltwin/1234/create -H "Content-Type: application/json"
 ```
 ```
 curl -XPOST -d '{
   "metric_value": "5"
-}' https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/1234/add-metric -H "Content-Type: application/json"
+}' https://shy-frost-2081.us-east1.kalix.app/digitaltwin/1234/add-metric -H "Content-Type: application/json"
 ```
 ```
-curl -XGET https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/1234 -H "Content-Type: application/json"
+curl -XGET https://shy-frost-2081.us-east1.kalix.app/digitaltwin/1234 -H "Content-Type: application/json"
 ```
 ```
 curl -XPOST -d '{
   "metric_value": "11"
-}' https://shy-frost-2081.us-east1.akkaserverless.app/digitaltwin/1234/add-metric -H "Content-Type: application/json"
+}' https://shy-frost-2081.us-east1.kalix.app/digitaltwin/1234/add-metric -H "Content-Type: application/json"
 ```
 ```
 digitaltwin_topic.proto

@@ -1,8 +1,8 @@
 package com.example.digitaltwin;
 
-import com.akkaserverless.javasdk.testkit.junit.AkkaServerlessTestKitResource;
 import com.example.digitaltwin.domain.DigitalTwinDomain;
 import com.google.protobuf.Empty;
+import kalix.javasdk.testkit.junit.KalixTestKitResource;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -19,14 +19,14 @@ import static org.junit.Assert.assertEquals;
 public class DigitalTwinIntegrationTest {
 
   /**
-   * The test kit starts both the service container and the Akka Serverless proxy.
+   * The test kit starts both the service container and the Kalix proxy.
    */
   @ClassRule
-  public static final AkkaServerlessTestKitResource testKit =
-    new AkkaServerlessTestKitResource(Main.createAkkaServerless());
+  public static final KalixTestKitResource testKit =
+    new KalixTestKitResource(Main.createKalix());
 
   /**
-   * Use the generated gRPC client to call the service through the Akka Serverless proxy.
+   * Use the generated gRPC client to call the service through the Kalix proxy.
    */
   private final DigitalTwinService client;
 
