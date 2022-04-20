@@ -1,10 +1,12 @@
 package com.example.digitaltwin.domain;
 
-import com.akkaserverless.javasdk.eventsourcedentity.EventSourcedEntityContext;
 import com.example.digitaltwin.DigitalTwinApi;
 import com.google.protobuf.Empty;
+import kalix.javasdk.eventsourcedentity.EventSourcedEntityContext;
+import kalix.javasdk.eventsourcedentity.EventSourcedEntity.Effect;
+import kalix.javasdk.eventsourcedentity.EventSourcedEntityContext;
 
-// This class was initially generated based on the .proto definition by Akka Serverless tooling.
+// This class was initially generated based on the .proto definition by Kalix tooling.
 // This is the implementation for the Event Sourced Entity Service described in your com/example/digitaltwin/digitaltwin_api.proto file.
 //
 // As long as this file exists it will not be overwritten: you can maintain it yourself,

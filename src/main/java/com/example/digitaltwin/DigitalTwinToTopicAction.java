@@ -7,7 +7,7 @@ import com.google.protobuf.Empty;
 
 import static com.google.protobuf.Empty.getDefaultInstance;
 
-// This class was initially generated based on the .proto definition by Akka Serverless tooling.
+// This class was initially generated based on the .proto definition by Kalix tooling.
 // This is the implementation for the Action Service described in your com/example/digitaltwin/digitaltwin_topic.proto file.
 //
 // As long as this file exists it will not be overwritten: you can maintain it yourself,
