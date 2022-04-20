@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
 
   <name>digitaltwin</name>
-    <properties>
+  <properties>
 
     <!-- TODO Update to your own Docker repository or Docker Hub scope -->
     <dockerImage>aklikic/${project.artifactId}</dockerImage>
@@ -233,9 +233,9 @@
       </plugin>
 
       <plugin>
-        <groupId>com.akkaserverless</groupId>
-        <artifactId>akkaserverless-maven-plugin</artifactId>
-        <version>${akkaserverless-sdk.version}</version>
+        <groupId>io.kalix</groupId>
+        <artifactId>kalix-maven-plugin</artifactId>
+        <version>${kalix-sdk.version}</version>
         <executions>
           <execution>
             <goals>
@@ -295,14 +295,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.akkaserverless</groupId>
-      <artifactId>akkaserverless-java-sdk</artifactId>
-      <version>${akkaserverless-sdk.version}</version>
+      <groupId>io.kalix</groupId>
+      <artifactId>kalix-java-sdk</artifactId>
+      <version>${kalix-sdk.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.akkaserverless</groupId>
-      <artifactId>akkaserverless-java-sdk-testkit</artifactId>
-      <version>${akkaserverless-sdk.version}</version>
+      <groupId>io.kalix</groupId>
+      <artifactId>kalix-java-sdk-testkit</artifactId>
+      <version>${kalix-sdk.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

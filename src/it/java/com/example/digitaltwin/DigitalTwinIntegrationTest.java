@@ -9,12 +9,12 @@ import org.junit.Test;
 import static java.util.concurrent.TimeUnit.*;
 import static org.junit.Assert.assertEquals;
 
-// This class was initially generated based on the .proto definition by Akka Serverless tooling.
+// This class was initially generated based on the .proto definition by Kalix tooling.
 //
 // As long as this file exists it will not be overwritten: you can maintain it yourself,
 // or delete it so it is regenerated as needed.
 
-// Example of an integration test calling our service via the Akka Serverless proxy
+// Example of an integration test calling our service via the Kalix proxy
 // Run all test classes ending with "IntegrationTest" using `mvn verify -Pit`
 public class DigitalTwinIntegrationTest {
 
